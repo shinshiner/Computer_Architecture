@@ -1,6 +1,3 @@
-#Student ID: 	515030910468
-#Student name:	Zelin Ye
-
 #iaddl:
 #	fetch:	icode:ifun <—— M1[PC]
 #		    rA:rB  <—— M1[PC+1]
