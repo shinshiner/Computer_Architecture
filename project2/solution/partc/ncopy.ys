@@ -1,0 +1,128 @@
+#Student ID: 	515030910468
+#Student name:	Zelin Ye
+
+#I modify the file to use instruction iaddl and unroll the loop with parameter 6,
+#because this way can speedup the program after my test.
+#Besides, I use an instruction to avoid a hazard and store value for next 'loop'
+#I also write instructions to deal with remaining elements.
+
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len ints to dst.
+# Return the number of positive ints (>0) contained in src.
+#
+# Include your name and ID here.
+#
+# Describe how and why you modified the baseline code.
+#
+##################################################################
+# Do not modify this portion
+# Function prologue.
+ncopy:	pushl %ebp		# Save old frame pointer
+	rrmovl %esp,%ebp	# Set up new frame pointer
+	pushl %esi		# Save callee-save regs
+	pushl %ebx
+	pushl %edi
+	mrmovl 8(%ebp),%ebx	# src
+	mrmovl 16(%ebp),%edx	# len
+	mrmovl 12(%ebp),%ecx	# dst
+
+##################################################################
+# You can modify this portion
+	# Loop header
+	xorl    %eax , %eax
+        iaddl   $-6 , %edx 	#len = len - 6
+        andl    %edx , %edx 
+	jl remain				# if so, goto Done:
+
+Loop:	mrmovl (%ebx), %esi	# read val from src
+	mrmovl 4(%ebx),	%edi
+	rmmovl %esi, (%ecx)		# store it to dst
+	andl %esi, %esi			# val <= 0?
+	jle LNpos1				# if so, goto Npos:		
+	iaddl $1,	%eax		# count++
+LNpos1: rmmovl %edi , 4(%ecx)
+        andl    %edi , %edi
+        jle     LNpos2
+        iaddl   $1, %eax
+LNpos2:mrmovl 8(%ebx) , %esi
+        mrmovl 12(%ebx),%edi
+        rmmovl %esi ,8 (%ecx)
+        andl    %esi ,%esi
+        jle LNpos3
+        iaddl   $1 , %eax
+LNpos3: rmmovl %edi , 12(%ecx)
+        andl    %edi , %edi
+        jle     LNpos4
+        iaddl   $1, %eax
+LNpos4: mrmovl 16(%ebx), %esi
+		mrmovl 20(%ebx), %edi
+		rmmovl %esi, 16(%ecx)
+		andl %esi,%esi
+		jle LNpos5
+		iaddl	$1,%eax
+LNpos5: rmmovl %edi , 20(%ecx)
+        andl    %edi , %edi
+        jle     nextLoop
+        iaddl   $1, %eax
+nextLoop:
+        iaddl   $24,%ebx
+        iaddl   $24,%ecx
+        iaddl   $-6,%edx
+        jge Loop            
+
+# maybe just have remaining elements, deal with them
+remain:  iaddl  $6 , %edx  # Restore the true len
+        iaddl   $-1, %edx
+        jl  Done
+        mrmovl (%ebx) , %esi
+        mrmovl 4(%ebx),%edi
+        rmmovl %esi , (%ecx)
+        andl    %esi ,%esi
+        jle rNpos
+        iaddl   $1 , %eax
+rNpos:  
+        iaddl   $-1, %edx
+        jl  Done
+        rmmovl  %edi , 4(%ecx)
+        andl    %edi , %edi
+        jle     rNpos1
+        iaddl   $1, %eax
+rNpos1:
+        iaddl   $-1 , %edx 
+        jl  Done
+        mrmovl 8(%ebx) , %esi
+		mrmovl 12(%ebx), %edi
+        rmmovl %esi , 8(%ecx)
+        andl    %esi ,%esi
+        jle rNpos2
+        iaddl   $1 , %eax
+rNpos2:
+		iaddl $-1,%edx
+		jl Done
+		rmmovl %edi,12(%ecx)
+		andl %edi,%edi
+		jle rNpos3
+		iaddl $1,%eax
+rNpos3:
+		iaddl   $-1 , %edx 
+        jl  Done
+        mrmovl 16(%ebx) , %esi
+		rmmovl %esi, 16(%ecx)
+        andl    %esi ,%esi
+        jle Done
+        iaddl   $1 , %eax
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	popl %edi               # Restore callee-save registers
+	popl %ebx
+	popl %esi
+	rrmovl %ebp, %esp
+	popl %ebp
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */

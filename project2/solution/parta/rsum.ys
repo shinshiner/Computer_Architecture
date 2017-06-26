@@ -1,0 +1,67 @@
+#Student ID: 	515030910468
+#Student name:	Zelin Ye
+
+# Execution from address 0
+	.pos 	0
+
+init:
+	irmovl 	Stack, %esp
+	irmovl	Stack, %ebp
+	call	Main
+	halt
+
+# Sample linked list
+.align 	4
+ele1:	
+		.long 	0x00a
+       	.long 	ele2
+ele2:	
+	 	.long 	0x0b0
+		.long 	ele3
+ele3:	
+	 	.long	0xc00
+		.long 	0
+
+Main:
+	pushl	%ebp
+	rrmovl	%esp , %ebp
+
+	irmovl	ele1 , %eax
+	pushl 	%eax
+	xorl	%eax , %eax
+
+	call rsum_list
+
+	popl 	%ebp
+	ret
+
+rsum_list:
+	pushl 	%ebp
+	rrmovl	%esp ,	%ebp
+	
+	pushl	%ecx				#push ls->val into stack, initially 0
+
+	irmovl	$4,		%edi
+	subl	%edi ,	%esp
+	
+	mrmovl	8(%ebp) , %edx		#get last pointer of this linklist
+	andl	%edx , %edx			#check whether (%edx) is 0
+	je	End						#if (%edx) is 0, goto End
+
+	mrmovl	(%edx) , %ecx  		#use %ecx temporarily store ls->val
+	
+	addl	%edi , 	%edx		#move linklist pointer forward
+	mrmovl 	(%edx),	%esi		#store value temporarily in esi
+	rmmovl	%esi , 	(%esp)		#store new value in the address pointed by %esp
+	call 	rsum_list
+	addl	%ebx , 	%eax		#use %ebx to add ls->val to result
+	irmovl	$4,		%edi
+
+	End:
+		addl 	%edi , %esp		#let %esp point to ls->val
+		popl	%ebx			#pop ls->val and store it in %ebx
+		popl 	%ebp
+		ret
+
+	.pos 0x100
+Stack:

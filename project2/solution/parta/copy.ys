@@ -1,0 +1,51 @@
+#Student ID: 	515030910468
+#Student name:	Zelin Ye
+
+    .pos    0
+init:   irmovl  Stack,  %esp
+        irmovl  Stack,  %ebp
+		call copy_block
+		halt
+
+    .align 4
+# Source block
+src:
+        .long 0x00a
+        .long 0x0b0
+         .long 0xc00
+# Destination block
+dest:
+         .long 0x111
+         .long 0x222
+        .long 0x333
+
+copy_block:
+		pushl   %ebp
+        rrmovl  %esp , %ebp
+
+		irmovl  src, %esi
+		irmovl  dest, %edx
+		irmovl  $3, %ecx
+
+        xorl    %eax , %eax
+        andl    %ecx, %ecx
+        je  End
+
+	Loop:   
+		mrmovl   (%esi) , %ebx
+        rmmovl  %ebx , (%edx)       #copy src value to dest
+        xorl    %ebx , %eax         #compute the value ^= val
+        irmovl  $4 ,  %edi      
+        addl    %edi , %edx         #dest++
+        addl    %edi , %esi         #src++
+        irmovl  $-1,%edi             
+        addl    %edi , %ecx         #len--
+        jne Loop
+
+	End:
+		rrmovl 	%ebp , %esp
+		popl    %ebp
+        ret
+
+        .pos    0x100
+ Stack:
