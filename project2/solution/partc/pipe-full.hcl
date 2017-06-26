@@ -1,6 +1,3 @@
-#Student ID: 	515030910468
-#Student name:	Zelin Ye
-
 #I implement iaddl instruction with the same logic in part B,
 #so I would not show much details in this file, corresponding 
 #content can refer to part B
